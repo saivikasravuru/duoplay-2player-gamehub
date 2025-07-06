@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DuoPlay – 2 Player Games</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>DuoPlay 🎮</h1>
+    <p>Choose a Game</p>
+
+    <div class="game-grid">
+      <a href="games/tictactoe.html" class="game-card">❌⭕ Tic Tac Toe</a>
+      <a href="games/rock-paper-scissors.html" class="game-card">✊✋✌️ Rock Paper Scissors</a>
+      <a href="games/dice-duel.html" class="game-card">🎲 Dice Duel</a>
+      <!-- More games like rock-paper-scissors.html can be added here -->
+    </div>
+  </div>
+  <div id="particles-js"></div>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    "particles": {
+      "number": { "value": 60 },
+      "size": { "value": 4 },
+      "move": { "speed": 2 },
+      "line_linked": { "enable": true, "opacity": 0.3 },
+      "color": { "value": "#ffffff" }
+    },
+    "interactivity": {
+      "events": { "onhover": { "enable": true, "mode": "repulse" } }
+    }
+  });
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+</body>
+</html>

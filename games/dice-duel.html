@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎲 Dice Duel – DuoPlay</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      padding: 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00ffd5;
+      z-index: 2;
+    }
+
+    .scoreboard {
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 4px #fff;
+      z-index: 2;
+    }
+
+    .dice {
+      font-size: 4rem;
+      margin: 20px;
+      animation: pop 0.3s ease;
+      z-index: 2;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.6); opacity: 0.5; }
+      50% { transform: scale(1.4); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    button {
+      padding: 12px 25px;
+      margin: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #00ffd5;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      z-index: 2;
+    }
+
+    button:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    h2#winner {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      color: #ffde59;
+      text-shadow: 0 0 5px #fff;
+      z-index: 2;
+    }
+
+    /* 🎲 Floating Background Elements */
+    .float {
+      position: absolute;
+      font-size: calc(1.2rem + 1vw);
+      opacity: 0.06;
+      pointer-events: none;
+      animation: floatSpin linear infinite;
+    }
+
+    @keyframes floatSpin {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+      100% { transform: translateY(0px) rotate(360deg); }
+    }
+
+    .splash {
+      position: absolute;
+      font-size: 2rem;
+      opacity: 1;
+      animation: splashDie 1s forwards;
+      z-index: 3;
+    }
+
+    @keyframes splashDie {
+      0% { transform: scale(1) translateY(0); opacity: 1; }
+      100% { transform: scale(2) translateY(-200px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 Dice Duel – DuoPlay</h1>
+
+  <div class="scoreboard">
+    <p>Player 1 Score: <span id="score1">0</span> | Turns: <span id="turns1">0</span>/4</p>
+    <p>Player 2 Score: <span id="score2">0</span> | Turns: <span id="turns2">0</span>/4</p>
+  </div>
+
+  <div class="dice" id="dice">🎲</div>
+
+  <button onclick="rollDice(1)">Player 1 Roll 🎯</button>
+  <button onclick="rollDice(2)">Player 2 Roll 🎯</button>
+  <button onclick="resetGame()">🔁 Reset Game</button>
+
+  <h2 id="winner"></h2>
+
+  <!-- 🎊 Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    let score1 = 0, score2 = 0;
+    let turns1 = 0, turns2 = 0;
+    const dice = document.getElementById("dice");
+    const score1Display = document.getElementById("score1");
+    const score2Display = document.getElementById("score2");
+    const turns1Display = document.getElementById("turns1");
+    const turns2Display = document.getElementById("turns2");
+    const winnerText = document.getElementById("winner");
+
+    function rollDice(player) {
+      const roll = Math.floor(Math.random() * 6) + 1;
+      dice.textContent = `🎲 ${roll}`;
+      dice.style.animation = 'none';
+      dice.offsetHeight;
+      dice.style.animation = null;
+
+      if (player === 1 && turns1 < 4) {
+        score1 += roll;
+        turns1++;
+        score1Display.textContent = score1;
+        turns1Display.textContent = turns1;
+      } else if (player === 2 && turns2 < 4) {
+        score2 += roll;
+        turns2++;
+        score2Display.textContent = score2;
+        turns2Display.textContent = turns2;
+      }
+
+      if (turns1 === 4 && turns2 === 4) {
+        declareWinner();
+      }
+    }
+
+    function declareWinner() {
+      let winner = "";
+      if (score1 > score2) {
+        winner = "🏆 Player 1 Wins!";
+      } else if (score2 > score1) {
+        winner = "🏆 Player 2 Wins!";
+      } else {
+        winner = "🤝 It's a Draw!";
+      }
+
+      winnerText.textContent = winner;
+
+      // 🎊 Confetti
+      confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+
+      // 🎲 Splash Animation
+      for (let i = 0; i < 30; i++) {
+        const die = document.createElement('div');
+        die.className = 'splash';
+        die.style.left = Math.random() * 100 + '%';
+        die.style.top = Math.random() * 100 + '%';
+        die.textContent = '🎲';
+        document.body.appendChild(die);
+        setTimeout(() => die.remove(), 1000);
+      }
+    }
+
+    function resetGame() {
+      score1 = score2 = turns1 = turns2 = 0;
+      score1Display.textContent = "0";
+      score2Display.textContent = "0";
+      turns1Display.textContent = "0";
+      turns2Display.textContent = "0";
+      dice.textContent = "🎲";
+      winnerText.textContent = "";
+    }
+
+    // Add 🎲, ❌ and ⭕ elements as floating background
+    const emojis = ['🎲', '❌', '⭕'];
+    const counts = { '🎲': 15, '❌': 15, '⭕': 15 };
+
+    for (const emoji of emojis) {
+      for (let i = 0; i < counts[emoji]; i++) {
+        const el = document.createElement('div');
+        el.className = 'float';
+        el.textContent = emoji;
+        el.style.left = Math.random() * 100 + '%';
+        el.style.top = Math.random() * 100 + '%';
+        el.style.animationDuration = (20 + Math.random() * 10) + 's';
+        el.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem';
+        document.body.appendChild(el);
+      }
+    }
+  </script>
+</body>
+</html>

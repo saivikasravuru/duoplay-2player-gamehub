@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rock Paper Scissors – DuoPlay</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      padding: 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top left, #4a542e, #428086, #24243e);
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2rem;
+      text-shadow: 0 0 8px #ff5e62, 0 0 12px #ff9966;
+      z-index: 1;
+    }
+
+    .players {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      margin-bottom: 40px;
+      z-index: 1;
+    }
+
+    .player {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px 30px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+      transition: transform 0.3s ease;
+    }
+
+    select {
+      padding: 10px;
+      margin-top: 15px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background: #ff5e62;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    select:hover {
+      background: #ff9966;
+    }
+
+    button {
+      margin: 10px;
+      padding: 12px 30px;
+      background: #fff;
+      color: #ff5e62;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      transition: background 0.3s, transform 0.2s;
+      z-index: 1;
+    }
+
+    button:hover {
+      background: #ffe1e1;
+      transform: scale(1.05);
+    }
+
+    .result, .score, .winner {
+      margin-top: 20px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .score {
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px #fff, 0 0 20px #ff5e62;
+    }
+
+    .result {
+      font-size: 1.2rem;
+    }
+
+    .winner {
+      font-size: 1.7rem;
+      color: #00ffcc;
+      margin-top: 30px;
+      animation: bounceIn 0.6s ease;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* 🎯 Floating Emoji Background */
+    .bg-emoji {
+      position: absolute;
+      font-size: 2rem;
+      opacity: 0.07;
+      animation: floatSpin linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floatSpin {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-40px) rotate(180deg); }
+      100% { transform: translateY(0px) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>✊✋✌️ Rock Paper Scissors</h1>
+
+  <div class="players">
+    <div class="player">
+      <h3>Player 1</h3>
+      <select id="p1">
+        <option value="">--Choose--</option>
+        <option value="rock">🪨 Rock</option>
+        <option value="paper">📄 Paper</option>
+        <option value="scissors">✂️ Scissors</option>
+      </select>
+    </div>
+
+    <div class="player">
+      <h3>Player 2</h3>
+      <select id="p2">
+        <option value="">--Choose--</option>
+        <option value="rock">🪨 Rock</option>
+        <option value="paper">📄 Paper</option>
+        <option value="scissors">✂️ Scissors</option>
+      </select>
+    </div>
+  </div>
+
+  <button onclick="playGame()">Play Round</button>
+  <button onclick="resetGame()">Start Over</button>
+
+  <div class="score" id="scoreBoard">Round: 0 | Player 1: 0 | Player 2: 0</div>
+  <div class="result" id="resultText"></div>
+  <div class="winner" id="finalWinner"></div>
+
+  <!-- 🎉 Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    let round = 0;
+    let score1 = 0;
+    let score2 = 0;
+
+    function playGame() {
+      const p1 = document.getElementById('p1').value;
+      const p2 = document.getElementById('p2').value;
+      const resultText = document.getElementById('resultText');
+      const scoreBoard = document.getElementById('scoreBoard');
+      const finalWinner = document.getElementById('finalWinner');
+
+      if (!p1 || !p2) {
+        resultText.textContent = "⚠️ Both players must choose!";
+        return;
+      }
+
+      round++;
+      if (round > 4) {
+        resultText.textContent = "Game over! Please click 'Start Over'.";
+        return;
+      }
+
+      if (p1 === p2) {
+        resultText.textContent = `Round ${round}: 🤝 It's a tie!`;
+      } else {
+        const winMap = {
+          rock: "scissors",
+          paper: "rock",
+          scissors: "paper"
+        };
+
+        if (winMap[p1] === p2) {
+          score1++;
+          resultText.textContent = `Round ${round}: 🎉 Player 1 Wins!`;
+        } else {
+          score2++;
+          resultText.textContent = `Round ${round}: 🎉 Player 2 Wins!`;
+        }
+      }
+
+      scoreBoard.textContent = `Round: ${round} | Player 1: ${score1} | Player 2: ${score2}`;
+
+      if (round === 4) {
+        if (score1 > score2) {
+          finalWinner.textContent = "🏆 Player 1 Wins the Game!";
+        } else if (score2 > score1) {
+          finalWinner.textContent = "🏆 Player 2 Wins the Game!";
+        } else {
+          finalWinner.textContent = "🤝 The Game is a Tie!";
+        }
+
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    function resetGame() {
+      round = 0;
+      score1 = 0;
+      score2 = 0;
+      document.getElementById('resultText').textContent = "";
+      document.getElementById('finalWinner').textContent = "";
+      document.getElementById('scoreBoard').textContent = "Round: 0 | Player 1: 0 | Player 2: 0";
+      document.getElementById('p1').value = "";
+      document.getElementById('p2').value = "";
+    }
+
+    // Add floating emoji background (6 rocks, 6 papers, 6 scissors)
+    const emojis = ['🪨', '📄', '✂️'];
+    for (let i = 0; i < 18; i++) {
+      const span = document.createElement('span');
+      span.className = 'bg-emoji';
+      span.textContent = emojis[i % 3];
+      span.style.left = Math.random() * 100 + '%';
+      span.style.top = Math.random() * 100 + '%';
+      span.style.animationDuration = (15 + Math.random() * 10) + 's';
+      span.style.fontSize = (1.5 + Math.random() * 2) + 'rem';
+      document.body.appendChild(span);
+    }
+  </script>
+</body>
+</html>

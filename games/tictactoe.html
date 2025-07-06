@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe – DuoPlay</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+body {
+  font-family: 'Press Start 2P', cursive;
+  margin: 0;
+  background: linear-gradient(-45deg, #b4258e, #62408a, #da8788, #ac5592);
+  background-size: 400% 400%;
+  animation: pulseGlow 6s ease-in-out infinite;
+  color: #fff;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: default;
+  text-align: center;
+  position: relative;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    filter: brightness(100%);
+  }
+  50% {
+    filter: brightness(120%);
+  }
+}
+
+        @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+        }
+
+    @keyframes floatSpin {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+      100% { transform: translateY(0px) rotate(360deg); }
+    }
+
+    .float {
+      position: absolute;
+      font-size: calc(1.2rem + 1vw);
+      opacity: 0.07;
+      pointer-events: none;
+      animation: floatSpin linear infinite;
+      z-index: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      z-index: 2;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.3s;
+      color: white;
+    }
+
+    .cell.x {
+      color: #ff4c4c; /* ❌ Red */
+    }
+
+    .cell.o {
+      color: #4cdfff; /* ⭕ Cyan */
+    }
+
+    .cell:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .status {
+      margin: 20px;
+      font-size: 0.9rem;
+      z-index: 2;
+    }
+
+    button.reset {
+      padding: 10px 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background-color: #61dafb;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+      z-index: 2;
+    }
+
+    button.reset:hover {
+      background-color: #21a1f1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe ❌⭕</h1>
+  <div class="status" id="status">Player X's turn</div>
+  <div class="board" id="board"></div>
+  <button class="reset" onclick="resetGame()">Reset Game</button>
+
+  <!-- Confetti JS -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Floating X & O -->
+  <script>
+    // Create 15 ❌ and 15 ⭕
+    const floatIcons = ['❌', '⭕'];
+    floatIcons.forEach(icon => {
+      for (let i = 0; i < 15; i++) {
+        const el = document.createElement('div');
+        el.className = 'float';
+        el.textContent = icon;
+        el.style.left = Math.random() * 100 + '%';
+        el.style.top = Math.random() * 100 + '%';
+        el.style.animationDuration = (20 + Math.random() * 10) + 's';
+        el.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem';
+        document.body.appendChild(el);
+      }
+    });
+  </script>
+
+  <script>
+    const board = document.getElementById("board");
+    const statusText = document.getElementById("status");
+    let currentPlayer = "X";
+    let cells = Array(9).fill("");
+
+    const winCombos = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+
+    function renderBoard() {
+      board.innerHTML = "";
+      cells.forEach((cell, idx) => {
+        const button = document.createElement("button");
+        button.classList.add("cell");
+        button.textContent = cell;
+        if (cell === "X") button.classList.add("x");
+        if (cell === "O") button.classList.add("o");
+        button.addEventListener("click", () => makeMove(idx));
+        board.appendChild(button);
+      });
+    }
+
+    function makeMove(idx) {
+      if (cells[idx] !== "") return;
+
+      cells[idx] = currentPlayer;
+      renderBoard();
+
+      if (checkWinner()) {
+        statusText.textContent = `🎉 Player ${currentPlayer} wins!`;
+        board.querySelectorAll(".cell").forEach(btn => btn.disabled = true);
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+        return;
+      }
+
+      if (!cells.includes("")) {
+        statusText.textContent = "It's a draw!";
+        return;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      statusText.textContent = `Player ${currentPlayer}'s turn`;
+    }
+
+    function checkWinner() {
+      return winCombos.some(combo =>
+        combo.every(index => cells[index] === currentPlayer)
+      );
+    }
+
+    function resetGame() {
+      currentPlayer = "X";
+      cells = Array(9).fill("");
+      statusText.textContent = `Player ${currentPlayer}'s turn`;
+      renderBoard();
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
