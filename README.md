@@ -2,6 +2,9 @@
 
 Welcome to **Duoplay**, a browser-based mini-game hub built for local 2-player fun! This collection features three classic games to challenge your friends.
 
+🌐 Live Demo: [duoplay-2player-gamehub.vercel.app](https://duoplay-2player-gamehub.vercel.app/)
+
+
 ## 🕹️ Games Included
 
 1. ✖️⭕ **Tic Tac Toe** – Strategize and try to get 3 in a row!
